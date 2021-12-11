@@ -2,7 +2,35 @@
 
 from tkinter import *
 from tkinter import ttk, messagebox
+from datetime import datetime
+#######################
+def timestamp(thai=True):
+	if thai == True:
+		stamp = datetime.now()
+		stamp = stamp.replace(year=stamp.year+543) # บวกเป็น พ.ศ.
+		stamp = stamp.strftime('%Y-%m-%d %H:%M:%S')
+	else:
+		stamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
+	return stamp
+
+def writetext(quantity,total):
+	# stamp = datetime.now()
+	# stamp = stamp.replace(year=stamp.year+543) # บวกเป็น พ.ศ.
+	# stamp = stamp.strftime('%Y-%m-%d %H:%M:%S')
+	stamp = timestamp()
+	filename = 'data.txt'
+	with open(filename,'a',encoding='utf-8') as file:
+		file.write('\n'+ 'วัน-เวลา: {} ทุเรียน: {} กก. รวมยอดทั้งหมด: {:,.2f} บาท'.format(stamp,quantity,total))
+
+def writecsv(data):
+	# data = ['Time',10,500]
+	with open('data.csv','a',newline='',encoding='utf-8') as file:
+		fw = csv.writer(file) # fw = file writer
+		fw.writerow(data)
+	print('Success')
+
+#######################
 GUI = Tk()
 GUI.geometry('600x700')
 GUI.title('โปรแกรมของลุง')
@@ -27,8 +55,15 @@ def Calculate():
 	price = 100
 	print('จำนวน', float(quantity) * price)
 	cal = float(quantity) * price
-	messagebox.showinfo('ยอดที่ลูกค้าต้องจ่าย','ทุเรียนจำนวน {} กิโลกรัม ราคาทั้งหมด: {:,.2f} บาท'.format(quantity,cal))
+	# EN DATE
+	# stamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
+	# writetext(quantity,cal)
+	data = [timestamp(), quantity, cal]
+	writecsv(data)
+
+	# pop up
+	messagebox.showinfo('ยอดที่ลูกค้าต้องจ่าย','ทุเรียนจำนวน {} กิโลกรัม ราคาทั้งหมด: {:,.2f} บาท'.format(quantity,cal))
 
 B1 = ttk.Button(GUI, text='คำนวณ',command=Calculate)
 B1.pack(ipadx=30,ipady=20,pady=20)
