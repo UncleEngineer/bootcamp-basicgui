@@ -3,6 +3,7 @@
 from tkinter import *
 from tkinter import ttk, messagebox
 from datetime import datetime
+import csv
 #######################
 def timestamp(thai=True):
 	if thai == True:
@@ -11,7 +12,6 @@ def timestamp(thai=True):
 		stamp = stamp.strftime('%Y-%m-%d %H:%M:%S')
 	else:
 		stamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
 	return stamp
 
 def writetext(quantity,total):
@@ -29,6 +29,27 @@ def writecsv(data):
 		fw = csv.writer(file) # fw = file writer
 		fw.writerow(data)
 	print('Success')
+
+def readcsv():
+	with open('data.csv',newline='',encoding='utf-8') as file:
+		fr = csv.reader(file)
+		# print(list(fr))
+		data = list(fr)
+	return data
+
+def sumdata():
+	# ฟังชั่นนี้ใช้สำหรับรวมค่าที่ได้จาก csv ไฟล์สรุปออกมาเป็น 2 อย่าง
+	result = readcsv()
+	sumlist_quan = []
+	sumlist_total = []
+	for d in result:
+		sumlist_quan.append(float(d[1]))
+		sumlist_total.append(float(d[2]))
+	sumquan = sum(sumlist_quan)
+	sumtotal = sum(sumlist_total)
+
+	return (sumquan,sumtotal)
+
 
 #######################
 GUI = Tk()
@@ -63,7 +84,10 @@ def Calculate():
 	writecsv(data)
 
 	# pop up
-	messagebox.showinfo('ยอดที่ลูกค้าต้องจ่าย','ทุเรียนจำนวน {} กิโลกรัม ราคาทั้งหมด: {:,.2f} บาท'.format(quantity,cal))
+	sm = sumdata()
+	title = 'ยอดที่ลูกค้าต้องจ่าย'
+	text = 'ทุเรียนจำนวน {} กิโลกรัม ราคาทั้งหมด: {:,.2f} บาท\nจำนวนที่ขายได้: {} กก.\nยอดขาย: {} บาท'.format(quantity,cal,sm[0],sm[1])
+	messagebox.showinfo(title,text)
 
 B1 = ttk.Button(GUI, text='คำนวณ',command=Calculate)
 B1.pack(ipadx=30,ipady=20,pady=20)
